@@ -25,6 +25,10 @@ const modalOk=document.getElementById('modal-ok');
 function showModal(){modal.classList.add('show');}
 function hideModal(){modal.classList.remove('show');modalOk.style.display='none';modalOk.onclick=null;}
 
+function delay(ms){
+  return new Promise(res=>setTimeout(res,ms));
+}
+
 function render(){
   ['p1','p2'].forEach((id,idx)=>{
     const div=document.getElementById(id+'Coins');
@@ -452,22 +456,25 @@ function checkVictory(){
   }
 }
 
-function computerTurn(){
+async function computerTurn(){
   if(gameOver) return;
   if(currentPlayer!==computerIdx) return;
   const p=players[computerIdx];
 
   if(canConvert(p) && Math.random()<0.6){
-    convert(computerIdx);
+    await convert(computerIdx);
+    await delay(500);
   }
 
   placeCoin(computerIdx,p.highest);
+  await delay(500);
 
   if(!p.convertedThisTurn && canConvert(p) && Math.random()<0.3){
-    convert(computerIdx);
+    await convert(computerIdx);
+    await delay(500);
   }
 
-  setTimeout(()=>endTurn(computerIdx),500);
+  await endTurn(computerIdx);
 }
 
 document.getElementById('p1Convert').addEventListener('click',()=>convert(0));
