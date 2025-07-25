@@ -140,6 +140,59 @@ function createCoinElement(src){
   return img;
 }
 
+function getDownConvertOptions(coin){
+  switch(coin){
+    case 'quarter':
+      return [["quarter"],["dime","dime","nickel"]];
+    case 'dime':
+      return [["dime"],["nickel","nickel"]];
+    case 'nickel':
+      return [["nickel"],["penny","penny","penny","penny","penny"]];
+    default:
+      return [[coin]];
+  }
+}
+
+async function maybeDownConvert(idx,coin){
+  const opts=getDownConvertOptions(coin);
+  if(opts.length<=1) return;
+  const p=players[idx];
+  if(idx===computerIdx){
+    if(Math.random()<0.5){
+      const choice=opts[1];
+      removeCoins(p,coin,1);
+      p.total-=coinDefs[coin].value;
+      choice.forEach(c=>{p.coins.push(c);p.total+=coinDefs[c].value;});
+      updateHighest(p);
+      log('Computer down converts a '+coin+'.');
+    }
+    return;
+  }
+  return new Promise(resolve=>{
+    modalBody.innerHTML='<div>Choose how to keep your '+coin+':</div>';
+    opts.forEach((set,i)=>{
+      const div=document.createElement('div');
+      div.style.cursor='pointer';
+      div.style.display='inline-block';
+      div.style.margin='10px';
+      set.forEach(c=>{div.appendChild(createCoinElement(coinDefs[c].img));});
+      div.onclick=()=>{
+        if(i!==0){
+          removeCoins(p,coin,1);
+          p.total-=coinDefs[coin].value;
+          set.forEach(c=>{p.coins.push(c);p.total+=coinDefs[c].value;});
+          updateHighest(p);
+        }
+        hideModal();
+        render();
+        resolve();
+      };
+      modalBody.appendChild(div);
+    });
+    showModal();
+  });
+}
+
 function flipAnimation(img){
   return new Promise(res=>{
     img.classList.add('flipping');
@@ -195,15 +248,16 @@ async function pennyFlipModal(){
       msg.style.marginTop='10px';
       if(p1Heads!==p2Heads){
         const stealer=p1Heads?0:1;
-        const victim=1-stealer;
-        if(players[victim].coins.length>0){
-          const stolen=players[victim].coins.pop();
-          players[stealer].coins.push(stolen);
-          players[stealer].total+=coinDefs[stolen].value;
-          players[victim].total-=coinDefs[stolen].value;
-          updateHighest(players[stealer]);
-          updateHighest(players[victim]);
-          msg.textContent='Player '+(stealer+1)+' steals a '+stolen+' from Player '+(victim+1);
+          const victim=1-stealer;
+          if(players[victim].coins.length>0){
+            const stolen=players[victim].coins.pop();
+            players[stealer].coins.push(stolen);
+            players[stealer].total+=coinDefs[stolen].value;
+            players[victim].total-=coinDefs[stolen].value;
+            await maybeDownConvert(stealer,stolen);
+            updateHighest(players[stealer]);
+            updateHighest(players[victim]);
+            msg.textContent='Player '+(stealer+1)+' steals a '+stolen+' from Player '+(victim+1);
         }else{
           msg.textContent='No coin to steal.';
         }
@@ -246,17 +300,17 @@ async function highFlipModal(){
         if(p1Count===0&&p2Count===0){
           actionMsg='No player has a '+coin;
         }else if(p1Count>0&&p2Count===0){
-          transferCoin(0,1,coin);
+          await transferCoin(0,1,coin);
           actionMsg='Player 1 gives a '+coin+' to Player 2';
         }else if(p2Count>0&&p1Count===0){
-          transferCoin(1,0,coin);
+          await transferCoin(1,0,coin);
           actionMsg='Player 2 gives a '+coin+' to Player 1';
         }else{
           if(p1Count>p2Count){
-            transferCoin(0,1,coin);
+            await transferCoin(0,1,coin);
             actionMsg='Player 1 gives a '+coin+' to Player 2';
           }else if(p2Count>p1Count){
-            transferCoin(1,0,coin);
+            await transferCoin(1,0,coin);
             actionMsg='Player 2 gives a '+coin+' to Player 1';
           }else{
             removeCoins(players[0],coin,1);
@@ -315,11 +369,12 @@ async function endOfRoundSteal(){
   checkVictory();
 }
 
-function transferCoin(from,to,coin){
+async function transferCoin(from,to,coin){
   removeCoins(players[from],coin,1);
   players[from].total-=coinDefs[coin].value;
   players[to].coins.push(coin);
   players[to].total+=coinDefs[coin].value;
+  await maybeDownConvert(to,coin);
 }
 
 function checkVictory(){
