@@ -66,7 +66,8 @@ function render(){
       endBtn.disabled=currentPlayer!==idx || !players[idx].placedThisTurn;
     }
   });
-  document.getElementById('roundInfo').textContent='Round '+round+' – Player '+(currentPlayer+1)+'\'s turn';
+  const turnText=currentPlayer===0?"Your turn":"Computer's turn";
+  document.getElementById('roundInfo').textContent='Round '+round+' – '+turnText;
 }
 
 function placeCoin(idx,coin){
@@ -146,6 +147,19 @@ function createCoinElement(src){
   return img;
 }
 
+function formatCoins(arr){
+  const counts={};
+  arr.forEach(c=>{counts[c]=(counts[c]||0)+1;});
+  const parts=Object.keys(counts).map(c=>{
+    const n=counts[c];
+    const name=c+(n>1?"s":"");
+    return n===1?`a ${name}`:`${n} ${name}`;
+  });
+  if(parts.length===1) return parts[0];
+  const last=parts.pop();
+  return parts.join(', ')+' and '+last;
+}
+
 function getDownConvertOptions(coin){
   switch(coin){
     case 'quarter':
@@ -161,7 +175,7 @@ function getDownConvertOptions(coin){
 
 async function maybeDownConvert(idx,coin){
   const opts=getDownConvertOptions(coin);
-  if(opts.length<=1) return;
+  if(opts.length<=1) return [coin];
   const p=players[idx];
   if(idx===computerIdx){
     if(Math.random()<0.5){
@@ -170,28 +184,29 @@ async function maybeDownConvert(idx,coin){
       p.total-=coinDefs[coin].value;
       choice.forEach(c=>{p.coins.push(c);p.total+=coinDefs[c].value;});
       updateHighest(p);
+      return choice;
     }
-    return;
+    return [coin];
   }
   return new Promise(resolve=>{
     modalBody.innerHTML='<div>Choose how to keep your '+coin+':</div>';
     opts.forEach((set,i)=>{
       const div=document.createElement('div');
+      div.className='convert-option';
       div.style.cursor='pointer';
-      div.style.display='inline-block';
-      div.style.margin='10px';
       set.forEach(c=>{div.appendChild(createCoinElement(coinDefs[c].img));});
       div.onclick=()=>{
+        let finalCoins=[coin];
         if(i!==0){
           removeCoins(p,coin,1);
           p.total-=coinDefs[coin].value;
           set.forEach(c=>{p.coins.push(c);p.total+=coinDefs[c].value;});
           updateHighest(p);
+          finalCoins=set;
         }
-        // clear options but keep modal visible for follow-up message
         modalBody.innerHTML='';
         render();
-        resolve();
+        resolve(finalCoins);
       };
       modalBody.appendChild(div);
     });
@@ -254,16 +269,19 @@ async function pennyFlipModal(){
       msg.style.marginTop='10px';
       if(p1Heads!==p2Heads){
         const stealer=p1Heads?0:1;
-          const victim=1-stealer;
-          if(players[victim].coins.length>0){
-            const stolen=players[victim].coins.pop();
-            players[stealer].coins.push(stolen);
-            players[stealer].total+=coinDefs[stolen].value;
-            players[victim].total-=coinDefs[stolen].value;
-            await maybeDownConvert(stealer,stolen);
-            updateHighest(players[stealer]);
-            updateHighest(players[victim]);
-            msg.textContent='Player '+(stealer+1)+' steals a '+stolen+' from Player '+(victim+1);
+        const victim=1-stealer;
+        if(players[victim].coins.length>0){
+          const stolen=players[victim].coins.pop();
+          players[stealer].coins.push(stolen);
+          players[stealer].total+=coinDefs[stolen].value;
+          players[victim].total-=coinDefs[stolen].value;
+          const finalCoins=await maybeDownConvert(stealer,stolen);
+          updateHighest(players[stealer]);
+          updateHighest(players[victim]);
+          const phrase=stealer===0?'You':'Computer';
+          const verb=stealer===0?'steal':'steals';
+          const target=victim===0?'you':'Computer';
+          msg.textContent=phrase+' '+verb+' '+formatCoins(finalCoins)+' from '+target;
         }else{
           msg.textContent='No coin to steal.';
         }
@@ -306,18 +324,18 @@ async function highFlipModal(){
         if(p1Count===0&&p2Count===0){
           actionMsg='No player has a '+coin;
         }else if(p1Count>0&&p2Count===0){
-          await transferCoin(0,1,coin);
-          actionMsg='Player 1 gives a '+coin+' to Player 2';
+          const given=await transferCoin(0,1,coin);
+          actionMsg='You give '+formatCoins(given)+' to Computer';
         }else if(p2Count>0&&p1Count===0){
-          await transferCoin(1,0,coin);
-          actionMsg='Player 2 gives a '+coin+' to Player 1';
+          const given=await transferCoin(1,0,coin);
+          actionMsg='Computer gives '+formatCoins(given)+' to you';
         }else{
           if(p1Count>p2Count){
-            await transferCoin(0,1,coin);
-            actionMsg='Player 1 gives a '+coin+' to Player 2';
+            const given=await transferCoin(0,1,coin);
+            actionMsg='You give '+formatCoins(given)+' to Computer';
           }else if(p2Count>p1Count){
-            await transferCoin(1,0,coin);
-            actionMsg='Player 2 gives a '+coin+' to Player 1';
+            const given=await transferCoin(1,0,coin);
+            actionMsg='Computer gives '+formatCoins(given)+' to you';
           }else{
             removeCoins(players[0],coin,1);
             removeCoins(players[1],coin,1);
@@ -378,7 +396,8 @@ async function transferCoin(from,to,coin){
   players[from].total-=coinDefs[coin].value;
   players[to].coins.push(coin);
   players[to].total+=coinDefs[coin].value;
-  await maybeDownConvert(to,coin);
+  const finalCoins=await maybeDownConvert(to,coin);
+  return finalCoins||[coin];
 }
 
 function checkVictory(){
@@ -386,9 +405,9 @@ function checkVictory(){
   const p2Win=players[1].total>=100;
   if(p1Win||p2Win){
     if(players[0].total>players[1].total){
-      alert('Player 1 wins!');
+      alert('You win!');
     }else if(players[1].total>players[0].total){
-      alert('Player 2 wins!');
+      alert('Computer wins!');
     }else{
       alert('Tie game!');
     }

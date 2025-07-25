@@ -107,6 +107,13 @@ button:disabled{opacity:0.4;cursor:default;}
   max-width:90%;
   box-shadow:0 2px 8px rgba(0,0,0,0.4);
 }
+#modal .convert-option{
+  display:inline-block;
+  padding:10px;
+  margin:10px;
+  border:1px solid #fff;
+  border-radius:6px;
+}
 #modal .coin{width:80px;height:80px;margin:10px;}
 #modal .result{font-size:1.2rem;margin-top:5px;}
 #modal .flipping{animation:flip 0.6s linear;}
