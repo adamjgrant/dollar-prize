@@ -5,6 +5,7 @@ const coinDefs={
   quarter:{value:25,img:'images/quarter.svg'}
 };
 
+const computerIdx=1; // player 2 is the computer
 let players=[
   {coins:[],highest:'penny',total:0,convertedThisTurn:false,placedThisTurn:false},
   {coins:[],highest:'penny',total:0,convertedThisTurn:false,placedThisTurn:false}
@@ -31,12 +32,23 @@ function render(){
     ['penny','nickel','dime','quarter'].forEach(coin=>{
       const btn=document.getElementById(id+coin.charAt(0).toUpperCase()+coin.slice(1));
       if(btn){
-        btn.disabled=currentPlayer!==idx || players[idx].placedThisTurn || coin!==players[idx].highest;
+        if(idx===computerIdx){
+          btn.disabled=true;
+        }else{
+          btn.disabled=currentPlayer!==idx || players[idx].placedThisTurn || coin!==players[idx].highest;
+        }
       }
     });
 
-    document.getElementById(id+'Convert').disabled=currentPlayer!==idx || players[idx].convertedThisTurn;
-    document.getElementById(id+'EndTurn').disabled=currentPlayer!==idx || !players[idx].placedThisTurn;
+    const convertBtn=document.getElementById(id+'Convert');
+    const endBtn=document.getElementById(id+'EndTurn');
+    if(idx===computerIdx){
+      convertBtn.disabled=true;
+      endBtn.disabled=true;
+    }else{
+      convertBtn.disabled=currentPlayer!==idx || players[idx].convertedThisTurn;
+      endBtn.disabled=currentPlayer!==idx || !players[idx].placedThisTurn;
+    }
   });
   document.getElementById('roundInfo').textContent='Round '+round+' – Player '+(currentPlayer+1)+'\'s turn';
 }
@@ -69,6 +81,12 @@ function updateHighest(p){
     }
   });
   p.highest=maxCoin;
+}
+
+function canConvert(p){
+  const counts={penny:0,nickel:0,dime:0};
+  p.coins.forEach(c=>{if(counts.hasOwnProperty(c)) counts[c]++;});
+  return counts.penny>=5 || counts.nickel>=3 || (counts.nickel>=1 && counts.dime>=2);
 }
 
 function convert(idx){
@@ -121,7 +139,11 @@ function endTurn(idx){
     turnInRound=0;
     round++;  }
   currentPlayer=(currentPlayer+1)%2;
-  render(); }
+  render();
+  if(currentPlayer===computerIdx){
+    setTimeout(computerTurn,500);
+  }
+ }
 
 function countCoin(p,coinType){
   return p.coins.filter(c=>c===coinType).length;
@@ -207,15 +229,31 @@ function checkVictory(){
   }
 }
 
+function computerTurn(){
+  if(currentPlayer!==computerIdx) return;
+  const p=players[computerIdx];
+
+  if(canConvert(p) && Math.random()<0.6){
+    convert(computerIdx);
+  }
+
+  placeCoin(computerIdx,p.highest);
+
+  if(!p.convertedThisTurn && canConvert(p) && Math.random()<0.3){
+    convert(computerIdx);
+  }
+
+  setTimeout(()=>endTurn(computerIdx),500);
+}
+
 document.getElementById('p1Convert').addEventListener('click',()=>convert(0));
 document.getElementById('p1EndTurn').addEventListener('click',()=>endTurn(0));
-document.getElementById('p2Convert').addEventListener('click',()=>convert(1));
-document.getElementById('p2EndTurn').addEventListener('click',()=>endTurn(1));
+// player 2 is the computer so no manual controls
 
 // coin placement buttons
 ['Penny','Nickel','Dime','Quarter'].forEach(name=>{
   document.getElementById('p1'+name).addEventListener('click',()=>placeCoin(0,name.toLowerCase()));
-  document.getElementById('p2'+name).addEventListener('click',()=>placeCoin(1,name.toLowerCase()));
+  // no click handlers for player 2 (computer)
 });
 
 render();
