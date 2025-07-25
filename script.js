@@ -186,7 +186,7 @@ async function maybeDownConvert(idx,coin){
           set.forEach(c=>{p.coins.push(c);p.total+=coinDefs[c].value;});
           updateHighest(p);
         }
-        hideModal();
+        modalBody.innerHTML='';
         render();
         resolve();
       };
