@@ -9,8 +9,8 @@ body{font-family:Arial, sans-serif;margin:0;padding:0;}
 .coins-right{display:flex;flex-direction:row;align-items:center;margin-left:10px;}
 .total{margin-bottom:10px;font-weight:bold;}
 .coins img{width:40px;height:auto;}
-.coins-right img:not(:first-child){margin-left:-32px;}
-.coins-left img:not(:first-child){margin-right:-32px;}
+.coins-right img:not(:first-child){margin-left:6px;}
+.coins-left img:not(:first-child){margin-right:6px;}
 .coin-buttons button{background:none;border:none;padding:0;margin:2px;cursor:pointer;}
 .coin-buttons img{width:40px;height:auto;opacity:0.5;}
 .coin-buttons button:enabled img{opacity:1;}
