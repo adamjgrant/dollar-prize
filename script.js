@@ -13,6 +13,10 @@ let players=[
 let currentPlayer=0;
 let turnInRound=0;
 let round=1;
+let gameOver=false;
+
+const newGameBtn=document.getElementById('newGameBtn');
+newGameBtn.addEventListener('click',()=>location.reload());
 
 const modal=document.getElementById('modal');
 const modalBody=document.getElementById('modal-body');
@@ -71,6 +75,7 @@ function render(){
 }
 
 function placeCoin(idx,coin){
+  if(gameOver) return;
   const p=players[idx];
   if(p.placedThisTurn) return;
   if(idx!==currentPlayer) return;
@@ -107,6 +112,7 @@ function canConvert(p){
 }
 
 function convert(idx){
+  if(gameOver) return;
   const p=players[idx];
   if(p.convertedThisTurn)return;
   const counts={penny:0,nickel:0,dime:0,quarter:0};
@@ -345,6 +351,7 @@ async function highFlipModal(){
 }
 
 async function endTurn(idx){
+  if(gameOver) return;
   if(idx!==currentPlayer) return;
   const p=players[idx];
   if(!p.placedThisTurn) return;
@@ -388,18 +395,23 @@ function checkVictory(){
   const p1Win=players[0].total>=100;
   const p2Win=players[1].total>=100;
   if(p1Win||p2Win){
+    gameOver=true;
+    let msg='Tie game!';
     if(players[0].total>players[1].total){
-      alert('You win!');
+      msg='You win!';
     }else if(players[1].total>players[0].total){
-      alert('Computer wins!');
-    }else{
-      alert('Tie game!');
+      msg='Computer wins!';
     }
-    location.reload();
+    modalBody.textContent=msg;
+    modalOk.style.display='block';
+    modalOk.onclick=hideModal;
+    showModal();
+    render();
   }
 }
 
 function computerTurn(){
+  if(gameOver) return;
   if(currentPlayer!==computerIdx) return;
   const p=players[computerIdx];
 
