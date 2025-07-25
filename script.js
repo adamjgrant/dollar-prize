@@ -1,8 +1,8 @@
 const coinDefs={
-  penny:{value:1,img:'images/penny.svg'},
-  nickel:{value:5,img:'images/nickel.svg'},
-  dime:{value:10,img:'images/dime.svg'},
-  quarter:{value:25,img:'images/quarter.svg'}
+  penny:{value:1,img:'images/penny.png'},
+  nickel:{value:5,img:'images/nickel.png'},
+  dime:{value:10,img:'images/dime.png'},
+  quarter:{value:25,img:'images/quarter.png'}
 };
 
 let players=[
