@@ -1,4 +1,5 @@
 # Game rules
+
 Compete, steal, and gamble to win a physical prize between you and your opponent.
  ![[IMG_4299.jpg]]
 # Setup
@@ -28,18 +29,14 @@ Players alternate turns. On your turn, you must:
 - Once each player has played a turn this completes the round
 ### End of Round Steal
 
+Refer to this end of the round steal only once one of the players has at least 5¢ played. Otherwise skip this for now.
+
 1. At the end of each round, coin flips determine if any player can steal from another player. Only use coins from the bank and return them once this is complete.
 2. Always end a round with this steal flipping, **even the supposed winning round** to determine if the winner actually wins.
 
 ![[IMG_4281.jpg|450]]
-#### If neither player has at least 5¢
-
-1. Both players should flip a penny from the bank. If exactly one player flips heads, that player can steal one coin from the other player.
-2. Otherwise, each player continues.
 
 ![[IMG_4286.jpg|450]]
-#### If either player has at least 5¢
-From now on, only one coin is flipped at a time to determine the fate for both players.
 
 1. Like a handful of dice, take one coin of each (25/10/5/1) denomination and flip them simultaneously. Check the value of each in descending order start with the **quarter**:
     - **Heads:** Do one of the following, then proceed to the next round. **Ignore the result of lower denominations.**
