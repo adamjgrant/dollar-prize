@@ -10,7 +10,7 @@
 <div class='game'>
   <div class='player player1'>
     <h2>Player 1</h2>
-    <div class='coins' id='p1Coins'></div>
+    <div id='p1Total'></div>
     <div class='coin-buttons'>
       <button id='p1Penny'><img src='images/penny.png' alt='penny'></button>
       <button id='p1Nickel'><img src='images/nickel.png' alt='nickel'></button>
@@ -21,12 +21,14 @@
     <button id='p1EndTurn'>End Turn</button>
   </div>
   <div class='center'>
+    <div id='p1Coins' class='coins coins-left'></div>
     <img src='images/gift.png' alt='Prize' style='width:100px;height:auto;'>
+    <div id='p2Coins' class='coins coins-right'></div>
     <div id='roundInfo' style='margin-top:8px;'></div>
   </div>
   <div class='player player2'>
     <h2>Computer</h2>
-    <div class='coins' id='p2Coins'></div>
+    <div id='p2Total'></div>
     <div class='coin-buttons'>
       <button id='p2Penny'><img src='images/penny.png' alt='penny'></button>
       <button id='p2Nickel'><img src='images/nickel.png' alt='nickel'></button>
