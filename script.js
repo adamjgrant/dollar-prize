@@ -14,6 +14,13 @@ let currentPlayer=0;
 let turnInRound=0;
 let round=1;
 
+const modal=document.getElementById('modal');
+const modalBody=document.getElementById('modal-body');
+const modalOk=document.getElementById('modal-ok');
+
+function showModal(){modal.classList.add('show');}
+function hideModal(){modal.classList.remove('show');modalOk.style.display='none';modalOk.onclick=null;}
+
 function render(){
   ['p1','p2'].forEach((id,idx)=>{
     const div=document.getElementById(id+'Coins');
@@ -127,74 +134,136 @@ function convert(idx){
 function log(msg){
   document.getElementById('log').innerHTML+=msg+'<br>';}
 
-function endTurn(idx){
-  if(idx!==currentPlayer) return;
-  const p=players[idx];
-  if(!p.placedThisTurn) return;
-  p.convertedThisTurn=false;
-  p.placedThisTurn=false;
-  turnInRound++;
-  if(turnInRound===2){
-    endOfRoundSteal();
-    turnInRound=0;
-    round++;  }
-  currentPlayer=(currentPlayer+1)%2;
-  render();
-  if(currentPlayer===computerIdx){
-    setTimeout(computerTurn,500);
-  }
- }
-
-function countCoin(p,coinType){
-  return p.coins.filter(c=>c===coinType).length;
+function createCoinElement(src){
+  const img=document.createElement('img');
+  img.src=src;
+  img.className='coin';
+  return img;
 }
 
-function endOfRoundSteal(){
-  log('<hr>End of Round '+round);
-  const p1Total=players[0].total;
-  const p2Total=players[1].total;
-  if(p1Total<5&&p2Total<5){
-    const p1Heads=Math.random()<0.5;
-    const p2Heads=Math.random()<0.5;
-    log('P1 flips '+(p1Heads?'Heads':'Tails')+', P2 flips '+(p2Heads?'Heads':'Tails'));
-    if(p1Heads!==p2Heads){
-      const stealer=p1Heads?0:1;
-      const victim=1-stealer;
-      if(players[victim].coins.length>0){
-        const stolen=players[victim].coins.pop();
-        players[stealer].coins.push(stolen);
-        players[stealer].total+=coinDefs[stolen].value;
-        players[victim].total-=coinDefs[stolen].value;
-        log('Player '+(stealer+1)+' steals a '+stolen+' from Player '+(victim+1));
-        updateHighest(players[stealer]);
-        updateHighest(players[victim]);
+function flipAnimation(img){
+  return new Promise(res=>{
+    img.classList.add('flipping');
+    setTimeout(()=>{
+      img.classList.remove('flipping');
+      res();
+    },600);
+  });
+}
+
+async function pennyFlipModal(){
+  return new Promise(resolve=>{
+    modalBody.innerHTML='';
+    const playerDiv=document.createElement('div');
+    const playerImg=createCoinElement(coinDefs.penny.img);
+    const playerRes=document.createElement('div');
+    playerRes.className='result';
+    const flipBtn=document.createElement('button');
+    flipBtn.textContent='Flip';
+    playerDiv.appendChild(playerImg);
+    playerDiv.appendChild(playerRes);
+    playerDiv.appendChild(flipBtn);
+
+    const compDiv=document.createElement('div');
+    const compImg=createCoinElement(coinDefs.penny.img);
+    const compRes=document.createElement('div');
+    compRes.className='result';
+    compDiv.appendChild(compImg);
+    compDiv.appendChild(compRes);
+
+    const container=document.createElement('div');
+    container.style.display='flex';
+    container.style.justifyContent='space-around';
+    container.appendChild(playerDiv);
+    container.appendChild(compDiv);
+    modalBody.appendChild(container);
+    showModal();
+
+    flipBtn.onclick=async()=>{
+      flipBtn.disabled=true;
+      const p1Heads=Math.random()<0.5;
+      await flipAnimation(playerImg);
+      playerRes.textContent=p1Heads?'Heads':'Tails';
+      await new Promise(r=>setTimeout(r,500));
+
+      const p2Heads=Math.random()<0.5;
+      await flipAnimation(compImg);
+      compRes.textContent=p2Heads?'Heads':'Tails';
+
+      let msg=document.createElement('div');
+      msg.style.marginTop='10px';
+      if(p1Heads!==p2Heads){
+        const stealer=p1Heads?0:1;
+        const victim=1-stealer;
+        if(players[victim].coins.length>0){
+          const stolen=players[victim].coins.pop();
+          players[stealer].coins.push(stolen);
+          players[stealer].total+=coinDefs[stolen].value;
+          players[victim].total-=coinDefs[stolen].value;
+          updateHighest(players[stealer]);
+          updateHighest(players[victim]);
+          msg.textContent='Player '+(stealer+1)+' steals a '+stolen+' from Player '+(victim+1);
+        }else{
+          msg.textContent='No coin to steal.';
+        }
+      }else{
+        msg.textContent='No steal this round.';
       }
-    }
-  }else{
+      modalBody.appendChild(msg);
+      modalOk.style.display='block';
+      modalOk.onclick=()=>{hideModal();resolve();};
+    };
+  });
+}
+
+async function highFlipModal(){
+  return new Promise(async resolve=>{
+    modalBody.innerHTML='';
+    const info=document.createElement('div');
+    modalBody.appendChild(info);
+    const img=createCoinElement('');
+    modalBody.appendChild(img);
+    const resDiv=document.createElement('div');
+    resDiv.className='result';
+    modalBody.appendChild(resDiv);
+    showModal();
+
     const order=['quarter','dime','nickel','penny'];
+    let actionMsg='No steal this round.';
     for(const coin of order){
+      img.src=coinDefs[coin].img;
+      resDiv.textContent='';
+      info.textContent='Flipping '+coin+'...';
+      await flipAnimation(img);
       const heads=Math.random()<0.5;
-      log(coin+' flip: '+(heads?'Heads':'Tails'));
+      resDiv.textContent=heads?'Heads':'Tails';
+      await new Promise(r=>setTimeout(r,500));
       if(heads){
         const p1Count=countCoin(players[0],coin);
         const p2Count=countCoin(players[1],coin);
         if(p1Count===0&&p2Count===0){
-          log('No player has a '+coin);
+          actionMsg='No player has a '+coin;
         }else if(p1Count>0&&p2Count===0){
           transferCoin(0,1,coin);
+          actionMsg='Player 1 gives a '+coin+' to Player 2';
         }else if(p2Count>0&&p1Count===0){
           transferCoin(1,0,coin);
+          actionMsg='Player 2 gives a '+coin+' to Player 1';
         }else{
           if(p1Count>p2Count){
             transferCoin(0,1,coin);
+            actionMsg='Player 1 gives a '+coin+' to Player 2';
           }else if(p2Count>p1Count){
             transferCoin(1,0,coin);
+            actionMsg='Player 2 gives a '+coin+' to Player 1';
           }else{
             removeCoins(players[0],coin,1);
             removeCoins(players[1],coin,1);
             players[0].total-=coinDefs[coin].value;
             players[1].total-=coinDefs[coin].value;
-            log('Both players lose a '+coin);
+            updateHighest(players[0]);
+            updateHighest(players[1]);
+            actionMsg='Both players lose a '+coin;
           }
         }
         updateHighest(players[0]);
@@ -202,6 +271,45 @@ function endOfRoundSteal(){
         break;
       }
     }
+    const msg=document.createElement('div');
+    msg.style.marginTop='10px';
+    msg.textContent=actionMsg;
+    modalBody.appendChild(msg);
+    modalOk.style.display='block';
+    modalOk.onclick=()=>{hideModal();resolve();};
+  });
+}
+
+async function endTurn(idx){
+  if(idx!==currentPlayer) return;
+  const p=players[idx];
+  if(!p.placedThisTurn) return;
+  p.convertedThisTurn=false;
+  p.placedThisTurn=false;
+  turnInRound++;
+  if(turnInRound===2){
+    await endOfRoundSteal();
+    turnInRound=0;
+    round++;  }
+  currentPlayer=(currentPlayer+1)%2;
+  render();
+  if(currentPlayer===computerIdx){
+    setTimeout(computerTurn,500);
+  }
+}
+
+function countCoin(p,coinType){
+  return p.coins.filter(c=>c===coinType).length;
+}
+
+async function endOfRoundSteal(){
+  log('<hr>End of Round '+round);
+  const p1Total=players[0].total;
+  const p2Total=players[1].total;
+  if(p1Total<5 && p2Total<5){
+    await pennyFlipModal();
+  }else{
+    await highFlipModal();
   }
   checkVictory();
 }
