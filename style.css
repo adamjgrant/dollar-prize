@@ -2,14 +2,20 @@ body{font-family:Arial, sans-serif;margin:0;padding:0;}
 .game{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:center;padding:10px;}
 .player{flex:1 1 300px;text-align:center;padding:10px;}
 .center{flex:1 1 100%;text-align:center;padding:10px;display:flex;align-items:center;justify-content:center;}
+.player2{order:0;}
+.center{order:1;}
+.player1{order:2;}
 .coins-left{display:flex;flex-direction:row-reverse;align-items:center;margin-right:10px;}
 .coins-right{display:flex;flex-direction:row;align-items:center;margin-left:10px;}
 .total{margin-bottom:10px;font-weight:bold;}
-.coins img{width:40px;height:auto;margin:2px;}
+.coins img{width:40px;height:auto;}
+.coins-right img:not(:first-child){margin-left:-32px;}
+.coins-left img:not(:first-child){margin-right:-32px;}
 .coin-buttons button{background:none;border:none;padding:0;margin:2px;cursor:pointer;}
 .coin-buttons img{width:40px;height:auto;opacity:0.5;}
 .coin-buttons button:enabled img{opacity:1;}
 button{margin:5px;padding:10px 15px;font-size:1rem;}
+#prize{width:60px;height:auto;}
 #log{max-height:200px;overflow-y:auto;padding:10px;background:#f5f5f5;}
 #modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:1000;}
 #modal.show{display:flex;}

@@ -1,7 +1,7 @@
 const coinDefs={
-  penny:{value:1,img:'images/penny.png',tail:'images/penny_tail.png'},
-  nickel:{value:5,img:'images/nickel.png',tail:'images/nickel_tail.png'},
-  dime:{value:10,img:'images/dime.png',tail:'images/dime_tail.png'},
+  penny:{value:1,img:'images/penny.png',tail:'images/penny_tails.png'},
+  nickel:{value:5,img:'images/nickel.png',tail:'images/nickel_tails.png'},
+  dime:{value:10,img:'images/dime.png',tail:'images/dime_tails.png'},
   quarter:{value:25,img:'images/quarter.png',tail:'images/quarter_tails.png'}
 };
 
@@ -128,13 +128,10 @@ function convert(idx){
   if(converted){
     p.convertedThisTurn=true;
     updateHighest(p);
-    log('Player '+(idx+1)+' performs a conversion.');
     render();
   }
 }
 
-function log(msg){
-  document.getElementById('log').innerHTML+=msg+'<br>';}
 
 function createCoinElement(src){
   const img=document.createElement('img');
@@ -362,7 +359,6 @@ function countCoin(p,coinType){
 }
 
 async function endOfRoundSteal(){
-  log('<hr>End of Round '+round);
   const p1Total=players[0].total;
   const p2Total=players[1].total;
   if(p1Total<5 && p2Total<5){
@@ -378,7 +374,6 @@ async function transferCoin(from,to,coin){
   players[from].total-=coinDefs[coin].value;
   players[to].coins.push(coin);
   players[to].total+=coinDefs[coin].value;
-  log('Player '+(from+1)+' gives a '+coin+' to Player '+(to+1));
   await maybeDownConvert(to,coin);
 }
 
