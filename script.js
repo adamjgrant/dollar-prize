@@ -122,7 +122,7 @@ function canConvert(p){
   return counts.penny>=5 || counts.nickel>=2 || (counts.nickel>=1 && counts.dime>=2);
 }
 
-async function convert(idx){
+async function convert(idx,strategic=true){
   if(gameOver) return;
 
   const p=players[idx];
@@ -159,7 +159,26 @@ async function convert(idx){
     render();
   };
 
-  if(idx===computerIdx || options.length===1){
+  if(idx===computerIdx){
+    if(!strategic){
+      chooseAndApply(options[0]);
+      return;
+    }
+    const oppCounts=getCoinCounts(players[1-idx]);
+    const myCounts=getCoinCounts(players[idx]);
+    let bestRisk=computeRisk(myCounts,oppCounts);
+    let best=null;
+    for(const opt of options){
+      const testCounts={...myCounts};
+      for(const c in opt.from){testCounts[c]-=opt.from[c];}
+      testCounts[opt.to]=(testCounts[opt.to]||0)+1;
+      const r=computeRisk(testCounts,oppCounts);
+      if(r<bestRisk){bestRisk=r;best=opt;}
+    }
+    if(best){chooseAndApply(best);} 
+    return;
+  }
+  if(options.length===1){
     chooseAndApply(options[0]);
     return;
   }
@@ -419,6 +438,41 @@ function countCoin(p,coinType){
   return p.coins.filter(c=>c===coinType).length;
 }
 
+function getCoinCounts(p){
+  return ['penny','nickel','dime','quarter'].reduce((acc,c)=>{
+    acc[c]=countCoin(p,c);
+    return acc;
+  },{penny:0,nickel:0,dime:0,quarter:0});
+}
+
+function computeRisk(myCounts,otherCounts){
+  const weights={penny:1,nickel:2,dime:3,quarter:4};
+  let risk=0;
+  for(const coin in weights){
+    const diff=myCounts[coin]-otherCounts[coin];
+    if(diff>0) risk+=diff*weights[coin];
+  }
+  return risk;
+}
+
+function chooseBestPlacement(idx){
+  const p=players[idx];
+  const opp=players[1-idx];
+  const myCounts=getCoinCounts(p);
+  const oppCounts=getCoinCounts(opp);
+  const allowed=['penny','nickel','dime','quarter'].filter(c=>coinDefs[c].value<=coinDefs[p.highest].value);
+  let best=allowed[0];
+  let bestScore=Infinity;
+  for(const coin of allowed){
+    const testCounts={...myCounts};
+    testCounts[coin]++; 
+    const risk=computeRisk(testCounts,oppCounts);
+    const score=risk - coinDefs[coin].value/10;
+    if(score<bestScore){bestScore=score;best=coin;}
+  }
+  return best;
+}
+
 async function endOfRoundSteal(){
   const p1Total=players[0].total;
   const p2Total=players[1].total;
@@ -461,17 +515,31 @@ async function computerTurn(){
   if(currentPlayer!==computerIdx) return;
   const p=players[computerIdx];
 
-  if(canConvert(p) && Math.random()<0.6){
-    await convert(computerIdx);
-    await delay(500);
-  }
+  const strategic=Math.random()<0.7;
 
-  placeCoin(computerIdx,p.highest);
-  await delay(500);
-
-  if(!p.convertedThisTurn && canConvert(p) && Math.random()<0.3){
-    await convert(computerIdx);
+  if(strategic){
+    if(canConvert(p)){
+      await convert(computerIdx,true);
+      await delay(500);
+    }
+    const coin=chooseBestPlacement(computerIdx);
+    placeCoin(computerIdx,coin);
     await delay(500);
+    if(!p.convertedThisTurn && canConvert(p)){
+      await convert(computerIdx,true);
+      await delay(500);
+    }
+  }else{
+    if(canConvert(p) && Math.random()<0.6){
+      await convert(computerIdx,false);
+      await delay(500);
+    }
+    placeCoin(computerIdx,p.highest);
+    await delay(500);
+    if(!p.convertedThisTurn && canConvert(p) && Math.random()<0.3){
+      await convert(computerIdx,false);
+      await delay(500);
+    }
   }
 
   await endTurn(computerIdx);
