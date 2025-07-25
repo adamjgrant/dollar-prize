@@ -29,7 +29,7 @@ Players alternate turns. On your turn, you must:
 - Once each player has played a turn this completes the round
 ### End of Round Steal
 
-Refer to this end of the round steal only once one of the players has at least 5¢ played. Otherwise skip this for now.
+Only perform this end-of-round steal once a player has at least 5¢ in play. If both players are below 5¢, skip any coin flips for that round.
 
 1. At the end of each round, coin flips determine if any player can steal from another player. Only use coins from the bank and return them once this is complete.
 2. Always end a round with this steal flipping, **even the supposed winning round** to determine if the winner actually wins.

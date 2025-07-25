@@ -364,9 +364,7 @@ function countCoin(p,coinType){
 async function endOfRoundSteal(){
   const p1Total=players[0].total;
   const p2Total=players[1].total;
-  if(p1Total<5 && p2Total<5){
-    await pennyFlipModal();
-  }else{
+  if(p1Total>=5 || p2Total>=5){
     await highFlipModal();
   }
   checkVictory();
