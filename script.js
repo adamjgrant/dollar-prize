@@ -461,6 +461,17 @@ function chooseBestPlacement(idx){
   const myCounts=getCoinCounts(p);
   const oppCounts=getCoinCounts(opp);
   const allowed=['penny','nickel','dime','quarter'].filter(c=>coinDefs[c].value<=coinDefs[p.highest].value);
+
+  if(idx===computerIdx){
+    if(myCounts.dime===2 && myCounts.nickel===0 && allowed.includes('nickel') && allowed.includes('dime')){
+      const oppQuarters=oppCounts.quarter;
+      const myQuarters=myCounts.quarter;
+      if(oppQuarters-myQuarters===1){
+        return 'dime';
+      }
+      return 'nickel';
+    }
+  }
   let best=allowed[0];
   let bestScore=Infinity;
   for(const coin of allowed){
