@@ -4,23 +4,35 @@
 <meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'>
 <title>Dollar Prize</title>
-<link rel"stylesheet" href="style.css" />
+<link rel="stylesheet" href="style.css" />
 </head>
 <body>
 <div class='game'>
   <div class='player player1'>
     <h2>Player 1</h2>
     <div class='coins' id='p1Coins'></div>
+    <div class='coin-buttons'>
+      <button id='p1Penny'><img src='images/penny.svg' alt='penny'></button>
+      <button id='p1Nickel'><img src='images/nickel.svg' alt='nickel'></button>
+      <button id='p1Dime'><img src='images/dime.svg' alt='dime'></button>
+      <button id='p1Quarter'><img src='images/quarter.svg' alt='quarter'></button>
+    </div>
     <button id='p1Convert'>Convert</button>
     <button id='p1EndTurn'>End Turn</button>
   </div>
   <div class='center'>
-    <img src='images/prize.png' alt='Prize' style='width:100px;height:auto;'>
+    <img src='images/prize.svg' alt='Prize' style='width:100px;height:auto;'>
     <div id='roundInfo' style='margin-top:8px;'></div>
   </div>
   <div class='player player2'>
     <h2>Player 2</h2>
     <div class='coins' id='p2Coins'></div>
+    <div class='coin-buttons'>
+      <button id='p2Penny'><img src='images/penny.svg' alt='penny'></button>
+      <button id='p2Nickel'><img src='images/nickel.svg' alt='nickel'></button>
+      <button id='p2Dime'><img src='images/dime.svg' alt='dime'></button>
+      <button id='p2Quarter'><img src='images/quarter.svg' alt='quarter'></button>
+    </div>
     <button id='p2Convert'>Convert</button>
     <button id='p2EndTurn'>End Turn</button>
   </div>
