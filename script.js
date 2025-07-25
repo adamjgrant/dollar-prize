@@ -59,7 +59,10 @@ function render(){
       convertBtn.disabled=true;
       endBtn.disabled=true;
     }else{
-      convertBtn.disabled=currentPlayer!==idx || players[idx].convertedThisTurn;
+      convertBtn.disabled=
+        currentPlayer!==idx ||
+        players[idx].convertedThisTurn ||
+        !canConvert(players[idx]);
       endBtn.disabled=currentPlayer!==idx || !players[idx].placedThisTurn;
     }
   });
@@ -99,7 +102,7 @@ function updateHighest(p){
 function canConvert(p){
   const counts={penny:0,nickel:0,dime:0};
   p.coins.forEach(c=>{if(counts.hasOwnProperty(c)) counts[c]++;});
-  return counts.penny>=5 || counts.nickel>=3 || (counts.nickel>=1 && counts.dime>=2);
+  return counts.penny>=5 || counts.nickel>=2 || (counts.nickel>=1 && counts.dime>=2);
 }
 
 function convert(idx){
@@ -114,12 +117,11 @@ function convert(idx){
     p.total-=coinDefs.penny.value*5;
     p.total+=coinDefs.nickel.value;
     converted=true;
-  }else if(counts.nickel>=3){
-    removeCoins(p,'nickel',3);
-    p.coins.push('nickel');
+  }else if(counts.nickel>=2){
+    removeCoins(p,'nickel',2);
     p.coins.push('dime');
-    p.total-=coinDefs.nickel.value*3;
-    p.total+=coinDefs.nickel.value+coinDefs.dime.value;
+    p.total-=coinDefs.nickel.value*2;
+    p.total+=coinDefs.dime.value;
     converted=true;
   }else if(counts.nickel>=1&&counts.dime>=2){
     removeCoins(p,'nickel',1);
