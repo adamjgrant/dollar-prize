@@ -1,8 +1,8 @@
 const coinDefs={
-  penny:{value:1,img:'images/penny.png'},
-  nickel:{value:5,img:'images/nickel.png'},
-  dime:{value:10,img:'images/dime.png'},
-  quarter:{value:25,img:'images/quarter.png'}
+  penny:{value:1,img:'images/penny.png',tail:'images/penny_tail.png'},
+  nickel:{value:5,img:'images/nickel.png',tail:'images/nickel_tail.png'},
+  dime:{value:10,img:'images/dime.png',tail:'images/dime_tail.png'},
+  quarter:{value:25,img:'images/quarter.png',tail:'images/quarter_tails.png'}
 };
 
 const computerIdx=1; // player 2 is the computer
@@ -185,11 +185,13 @@ async function pennyFlipModal(){
       flipBtn.disabled=true;
       const p1Heads=Math.random()<0.5;
       await flipAnimation(playerImg);
+      playerImg.src=p1Heads?coinDefs.penny.img:coinDefs.penny.tail;
       playerRes.textContent=p1Heads?'Heads':'Tails';
       await new Promise(r=>setTimeout(r,500));
 
       const p2Heads=Math.random()<0.5;
       await flipAnimation(compImg);
+      compImg.src=p2Heads?coinDefs.penny.img:coinDefs.penny.tail;
       compRes.textContent=p2Heads?'Heads':'Tails';
 
       let msg=document.createElement('div');
@@ -238,6 +240,7 @@ async function highFlipModal(){
       info.textContent='Flipping '+coin+'...';
       await flipAnimation(img);
       const heads=Math.random()<0.5;
+      img.src=heads?coinDefs[coin].img:coinDefs[coin].tail;
       resDiv.textContent=heads?'Heads':'Tails';
       await new Promise(r=>setTimeout(r,500));
       if(heads){
