@@ -1,13 +1,13 @@
 const coinDefs={
-  penny:{value:1,img:'images/penny.png'},
-  nickel:{value:5,img:'images/nickel.png'},
-  dime:{value:10,img:'images/dime.png'},
-  quarter:{value:25,img:'images/quarter.png'}
+  penny:{value:1,img:'images/penny.svg'},
+  nickel:{value:5,img:'images/nickel.svg'},
+  dime:{value:10,img:'images/dime.svg'},
+  quarter:{value:25,img:'images/quarter.svg'}
 };
 
 let players=[
-  {coins:[],highest:'penny',total:0,convertedThisTurn:false},
-  {coins:[],highest:'penny',total:0,convertedThisTurn:false}
+  {coins:[],highest:'penny',total:0,convertedThisTurn:false,placedThisTurn:false},
+  {coins:[],highest:'penny',total:0,convertedThisTurn:false,placedThisTurn:false}
 ];
 let currentPlayer=0;
 let turnInRound=0;
@@ -26,18 +26,31 @@ function render(){
     const totalSpan=document.createElement('span');
     totalSpan.textContent=' $'+(players[idx].total/100).toFixed(2);
     div.appendChild(totalSpan);
+
+    // update coin buttons
+    ['penny','nickel','dime','quarter'].forEach(coin=>{
+      const btn=document.getElementById(id+coin.charAt(0).toUpperCase()+coin.slice(1));
+      if(btn){
+        btn.disabled=currentPlayer!==idx || players[idx].placedThisTurn || coin!==players[idx].highest;
+      }
+    });
+
+    document.getElementById(id+'Convert').disabled=currentPlayer!==idx || players[idx].convertedThisTurn;
+    document.getElementById(id+'EndTurn').disabled=currentPlayer!==idx || !players[idx].placedThisTurn;
   });
   document.getElementById('roundInfo').textContent='Round '+round+' – Player '+(currentPlayer+1)+'\'s turn';
-  document.getElementById('p1Convert').disabled=currentPlayer!==0||players[0].convertedThisTurn;
-  document.getElementById('p1EndTurn').disabled=currentPlayer!==0;
-  document.getElementById('p2Convert').disabled=currentPlayer!==1||players[1].convertedThisTurn;
-  document.getElementById('p2EndTurn').disabled=currentPlayer!==1;
 }
 
-function placeCoin(idx){
+function placeCoin(idx,coin){
   const p=players[idx];
-  p.coins.push(p.highest);
-  p.total+=coinDefs[p.highest].value;
+  if(p.placedThisTurn) return;
+  if(idx!==currentPlayer) return;
+  if(coin!==p.highest) return;
+  p.coins.push(coin);
+  p.total+=coinDefs[coin].value;
+  p.placedThisTurn=true;
+  updateHighest(p);
+  render();
 }
 
 function removeCoins(p,coinType,num){
@@ -97,9 +110,11 @@ function log(msg){
   document.getElementById('log').innerHTML+=msg+'<br>';}
 
 function endTurn(idx){
-  if(idx!==currentPlayer)return;
-  placeCoin(idx);
-  players[idx].convertedThisTurn=false;
+  if(idx!==currentPlayer) return;
+  const p=players[idx];
+  if(!p.placedThisTurn) return;
+  p.convertedThisTurn=false;
+  p.placedThisTurn=false;
   turnInRound++;
   if(turnInRound===2){
     endOfRoundSteal();
@@ -196,5 +211,11 @@ document.getElementById('p1Convert').addEventListener('click',()=>convert(0));
 document.getElementById('p1EndTurn').addEventListener('click',()=>endTurn(0));
 document.getElementById('p2Convert').addEventListener('click',()=>convert(1));
 document.getElementById('p2EndTurn').addEventListener('click',()=>endTurn(1));
+
+// coin placement buttons
+['Penny','Nickel','Dime','Quarter'].forEach(name=>{
+  document.getElementById('p1'+name).addEventListener('click',()=>placeCoin(0,name.toLowerCase()));
+  document.getElementById('p2'+name).addEventListener('click',()=>placeCoin(1,name.toLowerCase()));
+});
 
 render();
