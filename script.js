@@ -321,30 +321,14 @@ async function highFlipModal(){
       if(heads){
         const p1Count=countCoin(players[0],coin);
         const p2Count=countCoin(players[1],coin);
-        if(p1Count===0&&p2Count===0){
-          actionMsg='No player has a '+coin;
-        }else if(p1Count>0&&p2Count===0){
+        if(p1Count===p2Count){
+          actionMsg=p1Count===0?'No player has a '+coin:'Both players have the same number of '+coin+'s.';
+        }else if(p1Count>p2Count){
           const given=await transferCoin(0,1,coin);
           actionMsg='You give '+formatCoins(given)+' to Computer';
-        }else if(p2Count>0&&p1Count===0){
+        }else{
           const given=await transferCoin(1,0,coin);
           actionMsg='Computer gives '+formatCoins(given)+' to you';
-        }else{
-          if(p1Count>p2Count){
-            const given=await transferCoin(0,1,coin);
-            actionMsg='You give '+formatCoins(given)+' to Computer';
-          }else if(p2Count>p1Count){
-            const given=await transferCoin(1,0,coin);
-            actionMsg='Computer gives '+formatCoins(given)+' to you';
-          }else{
-            removeCoins(players[0],coin,1);
-            removeCoins(players[1],coin,1);
-            players[0].total-=coinDefs[coin].value;
-            players[1].total-=coinDefs[coin].value;
-            updateHighest(players[0]);
-            updateHighest(players[1]);
-            actionMsg='Both players lose a '+coin;
-          }
         }
         updateHighest(players[0]);
         updateHighest(players[1]);
