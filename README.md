@@ -1,5 +1,5 @@
-# Dollar Prize rules
- Compete, steal, and gamble to win a physical prize between you and your opponent.
+# Game rules
+Compete, steal, and gamble to win a physical prize between you and your opponent.
  ![[IMG_4299.jpg]]
 # Setup
 
@@ -17,7 +17,7 @@ They player to earn the most money at a minimum of $1 in a single round wins.
 Players alternate turns. On your turn, you must:
 
 1. **Place Coins:**  
-	- Add one coin to your side of the prize to the left of any coins you've already set down. The coin you play must equal your highest denomination. At the start of the game, your coin is the penny.
+	- Add one coin to your side of the prize to the left of any coins you've already set down. You may place any coin that is equal to or less than the highest coin you have on your side. At the start of the game, your coin is the penny.
 2. **Optional Conversion (once per turn):**  
     - After placing your coin, you **may** convert coins on your side into a higher denomination coin according to these rules:
 	    - **5 pennies** → **1 nickel**
