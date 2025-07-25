@@ -44,7 +44,11 @@ function render(){
         if(idx===computerIdx){
           btn.disabled=true;
         }else{
-          btn.disabled=currentPlayer!==idx || players[idx].placedThisTurn || coin!==players[idx].highest;
+          const highest=players[idx].highest;
+          btn.disabled=
+            currentPlayer!==idx ||
+            players[idx].placedThisTurn ||
+            coinDefs[coin].value>coinDefs[highest].value;
         }
       }
     });
@@ -66,7 +70,7 @@ function placeCoin(idx,coin){
   const p=players[idx];
   if(p.placedThisTurn) return;
   if(idx!==currentPlayer) return;
-  if(coin!==p.highest) return;
+  if(coinDefs[coin].value>coinDefs[p.highest].value) return;
   p.coins.push(coin);
   p.total+=coinDefs[coin].value;
   p.placedThisTurn=true;
