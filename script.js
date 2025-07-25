@@ -128,13 +128,10 @@ function convert(idx){
   if(converted){
     p.convertedThisTurn=true;
     updateHighest(p);
-    log('Player '+(idx+1)+' performs a conversion.');
     render();
   }
 }
 
-function log(msg){
-  document.getElementById('log').innerHTML+=msg+'<br>';}
 
 function createCoinElement(src){
   const img=document.createElement('img');
@@ -308,7 +305,6 @@ function countCoin(p,coinType){
 }
 
 async function endOfRoundSteal(){
-  log('<hr>End of Round '+round);
   const p1Total=players[0].total;
   const p2Total=players[1].total;
   if(p1Total<5 && p2Total<5){
@@ -324,7 +320,6 @@ function transferCoin(from,to,coin){
   players[from].total-=coinDefs[coin].value;
   players[to].coins.push(coin);
   players[to].total+=coinDefs[coin].value;
-  log('Player '+(from+1)+' gives a '+coin+' to Player '+(to+1));
 }
 
 function checkVictory(){
