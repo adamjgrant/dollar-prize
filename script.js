@@ -59,15 +59,22 @@ function render(){
 
     const convertBtn=document.getElementById(id+'Convert');
     const endBtn=document.getElementById(id+'EndTurn');
-    if(idx===computerIdx){
-      convertBtn.disabled=true;
-      endBtn.disabled=true;
-    }else{
-      convertBtn.disabled=
-        currentPlayer!==idx ||
-        players[idx].convertedThisTurn ||
-        !canConvert(players[idx]);
-      endBtn.disabled=currentPlayer!==idx || !players[idx].placedThisTurn;
+    if(convertBtn){
+      if(idx===computerIdx){
+        convertBtn.disabled=true;
+      }else{
+        convertBtn.disabled=
+          currentPlayer!==idx ||
+          players[idx].convertedThisTurn ||
+          !canConvert(players[idx]);
+      }
+    }
+    if(endBtn){
+      if(idx===computerIdx){
+        endBtn.disabled=true;
+      }else{
+        endBtn.disabled=currentPlayer!==idx || !players[idx].placedThisTurn;
+      }
     }
   });
   const turnText=currentPlayer===0?"Your turn":"Computer's turn";
@@ -111,38 +118,73 @@ function canConvert(p){
   return counts.penny>=5 || counts.nickel>=2 || (counts.nickel>=1 && counts.dime>=2);
 }
 
-function convert(idx){
+async function convert(idx){
   if(gameOver) return;
+
   const p=players[idx];
-  if(p.convertedThisTurn)return;
-  const counts={penny:0,nickel:0,dime:0,quarter:0};
-  p.coins.forEach(c=>counts[c]++);
-  let converted=false;
+  if(p.convertedThisTurn) return;
+
+  const counts={penny:0,nickel:0,dime:0};
+  p.coins.forEach(c=>{if(counts.hasOwnProperty(c)) counts[c]++;});
+
+  const options=[];
   if(counts.penny>=5){
-    removeCoins(p,'penny',5);
-    p.coins.push('nickel');
-    p.total-=coinDefs.penny.value*5;
-    p.total+=coinDefs.nickel.value;
-    converted=true;
-  }else if(counts.nickel>=2){
-    removeCoins(p,'nickel',2);
-    p.coins.push('dime');
-    p.total-=coinDefs.nickel.value*2;
-    p.total+=coinDefs.dime.value;
-    converted=true;
-  }else if(counts.nickel>=1&&counts.dime>=2){
-    removeCoins(p,'nickel',1);
-    removeCoins(p,'dime',2);
-    p.coins.push('quarter');
-    p.total-=coinDefs.nickel.value+coinDefs.dime.value*2;
-    p.total+=coinDefs.quarter.value;
-    converted=true;
+    options.push({from:{penny:5},to:'nickel'});
   }
-  if(converted){
+  if(counts.nickel>=2){
+    options.push({from:{nickel:2},to:'dime'});
+  }
+  if(counts.nickel>=1 && counts.dime>=2){
+    options.push({from:{nickel:1,dime:2},to:'quarter'});
+  }
+  if(options.length===0) return;
+
+  const apply=opt=>{
+    for(const c in opt.from){
+      removeCoins(p,c,opt.from[c]);
+      p.total-=coinDefs[c].value*opt.from[c];
+    }
+    p.coins.push(opt.to);
+    p.total+=coinDefs[opt.to].value;
     p.convertedThisTurn=true;
     updateHighest(p);
+  };
+
+  const chooseAndApply=opt=>{
+    apply(opt);
     render();
+  };
+
+  if(idx===computerIdx || options.length===1){
+    chooseAndApply(options[0]);
+    return;
   }
+
+  await new Promise(resolve=>{
+    modalBody.innerHTML='<div>Choose a conversion:</div>';
+    options.forEach(opt=>{
+      const div=document.createElement('div');
+      div.className='convert-option';
+      div.style.cursor='pointer';
+      Object.keys(opt.from).forEach(type=>{
+        for(let i=0;i<opt.from[type];i++){
+          div.appendChild(createCoinElement(coinDefs[type].img));
+        }
+      });
+      const arrow=document.createElement('span');
+      arrow.textContent='\u2192';
+      arrow.style.margin='0 8px';
+      div.appendChild(arrow);
+      div.appendChild(createCoinElement(coinDefs[opt.to].img));
+      div.onclick=()=>{
+        chooseAndApply(opt);
+        hideModal();
+        resolve();
+      };
+      modalBody.appendChild(div);
+    });
+    showModal();
+  });
 }
 
 
