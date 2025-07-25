@@ -186,6 +186,7 @@ async function maybeDownConvert(idx,coin){
           set.forEach(c=>{p.coins.push(c);p.total+=coinDefs[c].value;});
           updateHighest(p);
         }
+        // clear options but keep modal visible for follow-up message
         modalBody.innerHTML='';
         render();
         resolve();
