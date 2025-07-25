@@ -17,16 +17,18 @@ let round=1;
 function render(){
   ['p1','p2'].forEach((id,idx)=>{
     const div=document.getElementById(id+'Coins');
+    const total=document.getElementById(id+'Total');
     div.innerHTML='';
-    players[idx].coins.forEach(c=>{
+    const sorted=players[idx].coins.slice().sort((a,b)=>coinDefs[a].value-coinDefs[b].value);
+    sorted.forEach(c=>{
       const img=document.createElement('img');
       img.src=coinDefs[c].img;
       img.alt=c;
       div.appendChild(img);
     });
-    const totalSpan=document.createElement('span');
-    totalSpan.textContent=' $'+(players[idx].total/100).toFixed(2);
-    div.appendChild(totalSpan);
+    if(total){
+      total.textContent='$'+(players[idx].total/100).toFixed(2);
+    }
 
     // update coin buttons
     ['penny','nickel','dime','quarter'].forEach(coin=>{
