@@ -1,26 +1,112 @@
-body{font-family:Arial, sans-serif;margin:0;padding:0;}
-.game{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:center;padding:10px;}
-.player{flex:1 1 300px;text-align:center;padding:10px;}
-.center{flex:1 1 100%;text-align:center;padding:10px;display:flex;align-items:center;justify-content:center;}
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+body{
+  font-family:'Roboto',Arial, sans-serif;
+  margin:0;
+  padding:0;
+  color:#f0f0f0;
+  background:linear-gradient(135deg,#1f1c2c,#928dab);
+  min-height:100vh;
+}
+
+.game{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:flex-start;
+  justify-content:center;
+  padding:20px;
+  max-width:900px;
+  margin:0 auto;
+}
+
+.player{
+  flex:1 1 300px;
+  text-align:center;
+  padding:20px;
+  margin:10px;
+  background:rgba(255,255,255,0.1);
+  border-radius:8px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.3);
+  backdrop-filter:blur(4px);
+}
+
+.center{
+  flex:1 1 100%;
+  text-align:center;
+  padding:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
 .player2{order:0;}
 .center{order:1;}
 .player1{order:2;}
+.round-info{
+  font-size:1.2rem;
+  font-weight:bold;
+  margin-bottom:10px;
+}
 .coins-left{display:flex;flex-direction:row-reverse;align-items:center;margin-right:10px;}
 .coins-right{display:flex;flex-direction:row;align-items:center;margin-left:10px;}
 .total{margin-bottom:10px;font-weight:bold;}
-.coins img{width:40px;height:auto;}
+.coins img{
+  width:40px;
+  height:auto;
+  filter:drop-shadow(0 0 2px rgba(0,0,0,0.6));
+}
 .coins-right img:not(:first-child){margin-left:6px;}
 .coins-left img:not(:first-child){margin-right:6px;}
-.coin-buttons button{background:none;border:none;padding:0;margin:2px;cursor:pointer;}
-.coin-buttons img{width:40px;height:auto;opacity:0.5;}
+.coin-buttons button{
+  background:none;
+  border:none;
+  padding:0;
+  margin:2px;
+  cursor:pointer;
+  transition:transform 0.2s;
+}
+.coin-buttons button:hover{transform:scale(1.1);}
+.coin-buttons img{
+  width:40px;
+  height:auto;
+  opacity:0.5;
+  filter:drop-shadow(0 2px 2px rgba(0,0,0,0.4));
+  transition:opacity 0.2s;
+}
 .coin-buttons button:enabled img{opacity:1;}
-button{margin:5px;padding:10px 15px;font-size:1rem;}
+
+button{
+  margin:5px;
+  padding:10px 15px;
+  font-size:1rem;
+  border:none;
+  border-radius:4px;
+  background:#ff5252;
+  color:#fff;
+  box-shadow:0 2px 4px rgba(0,0,0,0.3);
+  cursor:pointer;
+  transition:background 0.2s,transform 0.2s;
+}
+
+button:hover:enabled{background:#ff1744;transform:translateY(-2px);}
+
+button:disabled{opacity:0.4;cursor:default;}
+
+#prize{width:70px;height:auto;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5));}
+
 #roundInfo{width:100%;align-self:flex-start;margin-top:0;}
-#prize{width:60px;height:auto;}
+
 #log{max-height:200px;overflow-y:auto;padding:10px;background:#f5f5f5;}
 #modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:1000;}
 #modal.show{display:flex;}
-#modal .modal-content{background:#fff;padding:20px;border-radius:8px;text-align:center;max-width:90%;}
+#modal .modal-content{
+  background:rgba(0,0,0,0.85);
+  color:#fff;
+  padding:30px;
+  border-radius:8px;
+  text-align:center;
+  max-width:90%;
+  box-shadow:0 2px 8px rgba(0,0,0,0.4);
+}
 #modal .coin{width:80px;height:80px;margin:10px;}
 #modal .result{font-size:1.2rem;margin-top:5px;}
 #modal .flipping{animation:flip 0.6s linear;}
