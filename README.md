@@ -1,5 +1,6 @@
 # Game rules
 
+
 Compete, steal, and gamble to win a physical prize between you and your opponent.
  ![[IMG_4299.jpg]]
 # Setup
@@ -40,11 +41,8 @@ Refer to this end of the round steal only once one of the players has at least 5
 
 1. Like a handful of dice, take one coin of each (25/10/5/1) denomination and flip them simultaneously. Check the value of each in descending order start with the **quarter**:
     - **Heads:** Do one of the following, then proceed to the next round. **Ignore the result of lower denominations.**
-        - If exactly one player has a quarter they must give that quarter to their opponent, who places it as their new outermost coin.
-        - If both players have a quarter
-            - The player with the most of that coin gives one to the other player
-            - If both players have the same quantity, **both lose one of their quarters** back to their own supplies.
-        - If neither player has a quarter, nothing happens.
+        - The player with more quarters than the other gives one quarter to the other player.
+        - If both have the same number of quarters, nothing happens.
     - **Tails:** proceed to look at the **dime** and follow the same rules as above for dimes.
     - If tails again, check the **nickel**, then finally a **penny**, following the same rules.
     - If tails is flipped for all four coins (quarter, dime, nickel, penny), nothing happens that round.
