@@ -168,7 +168,6 @@ async function maybeDownConvert(idx,coin){
       p.total-=coinDefs[coin].value;
       choice.forEach(c=>{p.coins.push(c);p.total+=coinDefs[c].value;});
       updateHighest(p);
-      log('Computer down converts a '+coin+'.');
     }
     return;
   }
