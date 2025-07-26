@@ -83,8 +83,8 @@ function render(){
       }
     }
   });
-  const turnText=currentPlayer===0?"Your turn":"Computer's turn";
-  document.getElementById('roundInfo').textContent='Round '+round+' – '+turnText;
+  // The navbar now displays a static Rules link instead of the current round
+  // information, so we no longer update that element here.
 }
 
 function placeCoin(idx,coin){
