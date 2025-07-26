@@ -315,6 +315,45 @@ function flipAnimation(img){
   });
 }
 
+function chooseSideModal(){
+  return new Promise(resolve=>{
+    modalBody.innerHTML='<div>Choose heads or tails</div>';
+    const btnHeads=document.createElement('button');
+    const btnTails=document.createElement('button');
+    btnHeads.textContent='Heads';
+    btnTails.textContent='Tails';
+    btnHeads.onclick=()=>{hideModal();resolve('heads');};
+    btnTails.onclick=()=>{hideModal();resolve('tails');};
+    modalBody.appendChild(btnHeads);
+    modalBody.appendChild(btnTails);
+    showModal();
+  });
+}
+
+function flipFivePenniesModal(){
+  return new Promise(async resolve=>{
+    modalBody.innerHTML='<div>Flipping pennies...</div>';
+    const container=document.createElement('div');
+    container.style.display='flex';
+    container.style.justifyContent='space-around';
+    modalBody.appendChild(container);
+    showModal();
+    const results=[];
+    for(let i=0;i<5;i++){
+      const img=createCoinElement(coinDefs.penny.img);
+      container.appendChild(img);
+      await delay(200);
+      await flipAnimation(img);
+      const heads=Math.random()<0.5;
+      img.src=heads?coinDefs.penny.img:coinDefs.penny.tail;
+      results.push(heads?'heads':'tails');
+      await delay(200);
+    }
+    modalOk.style.display='block';
+    modalOk.onclick=()=>{hideModal();resolve(results);};
+  });
+}
+
 async function pennyFlipModal(){
   return new Promise(resolve=>{
     modalBody.innerHTML='';
@@ -586,4 +625,21 @@ document.getElementById('p1EndTurn').addEventListener('click',()=>endTurn(0));
   // no click handlers for player 2 (computer)
 });
 
+async function setupGame(){
+  const playerSide=await chooseSideModal();
+  const results=await flipFivePenniesModal();
+  results.forEach(r=>{
+    const idx=r===playerSide?0:1;
+    players[idx].coins.push('penny');
+    players[idx].total+=coinDefs.penny.value;
+  });
+  updateHighest(players[0]);
+  updateHighest(players[1]);
+  render();
+  if(currentPlayer===computerIdx){
+    setTimeout(computerTurn,500);
+  }
+}
+
 render();
+setupGame();
