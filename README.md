@@ -1,7 +1,7 @@
 # Game rules
 
 
-Compete, steal, and gamble to win a physical prize between you and your opponent.
+# Compete to be the first player to exactly one dollar without going over.
  ![[IMG_4299.jpg]]
 # Setup
 
@@ -10,7 +10,7 @@ Compete, steal, and gamble to win a physical prize between you and your opponent
 - A small supply of pennies, nickels, dimes, and quarters.
 # Objective
 
-They player to earn the most money at a minimum of $1 in a single round wins.
+Be the first player to reach **exactly** $1. Players may never exceed $1.
 # Gameplay
 
 ![[IMG_4280.jpg|450]]
@@ -35,28 +35,10 @@ Players alternate turns. On your turn, you must:
     - After converting, place the new denomination coin as your new outermost coin and return any converted coins to the bank.
 - Throughout the game, your coins must be in ascending order from the prize outwards.
 - Once each player has played a turn this completes the round
-### End of Round Steal
+### End of Round Swap
 
-Refer to this end of the round steal only once one of the players has at least 5¢ played. Otherwise skip this for now.
-
-1. At the end of each round, coin flips determine if any player can steal from another player. Only use coins from the bank and return them once this is complete.
-2. Always end a round with this steal flipping, **even the supposed winning round** to determine if the winner actually wins.
-
-![[IMG_4281.jpg|450]]
-
-![[IMG_4286.jpg|450]]
-
-1. Like a handful of dice, take the coin of the highest denomination currently on the board and one of every denomination below it and flip them simultaneously. Check the value of each in descending order. Start with the highest value. For example, assuming the **quarter** is the highest denomination that currently appears:
-    - **Heads:** Do one of the following, then proceed to the next round. **Ignore the result of lower denominations.**
-        - The player with more quarters than the other gives one quarter to the other player.
-        - If both have the same number of quarters, nothing happens.
-    - **Tails:** proceed to look at the **dime** and follow the same rules as above for dimes.
-    - If tails again, check the **nickel**, then finally a **penny**, following the same rules.
-    - If tails is flipped for all four coins (quarter, dime, nickel, penny), nothing happens that round.
-2. The winner of the steal can down convert the coin they earn to any denominations of equal value.
-
-![[IMG_4290.jpg|450]]
+After both players have taken a turn, check to see if one player has the same number of one denomination as the other player has of a different denomination. If that shared amount is **two or more**, they may swap that many coins. You will be shown a **Swap** button displaying a single coin from each side with an arrow between them. The computer decides automatically when it benefits.
+The computer usually avoids setting up swaps where you could trade for a higher value coin and, when it has the chance, will swap for the better coin about 80% of the time.
 # Clarifications
 - **A conversion** can only happen once per turn but it **does not cost you a turn**. You can either start or end your turn with a conversion, then play that converted value if you want.
-- **The first player does not have the advantage**. If the first player gets to $1 in their turn, the second player can still play their turn for the round. If they score above $1, they win. If both end up with the same value, they should do the coin flip sequence again to see if any final steals happen. If after all that, both are still equal, they tie and share the prize.
-- **Any coin is steal-able in the end of round steal**. It doesn't need to be the highest denomination for either player.
+- **The first player does not have the advantage**. If the first player gets to $1 in their turn, the second player can still play their turn for the round. If both end up with exactly $1 after the swap step, they tie and share the prize.

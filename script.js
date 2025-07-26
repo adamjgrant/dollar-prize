@@ -8,6 +8,8 @@ const coinDefs={
 const computerIdx=1; // player 2 is the computer
 // probability that the computer will use its smarter strategies
 const STRATEGY_CHANCE=0.5;
+const AVOID_SWAP_CHANCE=0.8; // computer avoids giving user swap 80% of time
+const TAKE_SWAP_CHANCE=0.8;  // computer takes beneficial swap 80% of time
 let players=[
   {coins:[],highest:'penny',total:0,convertedThisTurn:false,placedThisTurn:false},
   {coins:[],highest:'penny',total:0,convertedThisTurn:false,placedThisTurn:false}
@@ -58,7 +60,8 @@ function render(){
           btn.disabled=
             currentPlayer!==idx ||
             players[idx].placedThisTurn ||
-            coinDefs[coin].value>coinDefs[highest].value;
+            coinDefs[coin].value>coinDefs[highest].value ||
+            players[idx].total+coinDefs[coin].value>100;
         }
       }
     });
@@ -93,6 +96,7 @@ function placeCoin(idx,coin){
   if(p.placedThisTurn) return;
   if(idx!==currentPlayer) return;
   if(coinDefs[coin].value>coinDefs[p.highest].value) return;
+  if(p.total+coinDefs[coin].value>100) return;
   p.coins.push(coin);
   p.total+=coinDefs[coin].value;
   p.placedThisTurn=true;
@@ -182,6 +186,15 @@ async function convert(idx,strategic=true){
     }
     const oppCounts=getCoinCounts(players[1-idx]);
     const myCounts=getCoinCounts(players[idx]);
+    if(Math.random()<AVOID_SWAP_CHANCE){
+      const safe=options.filter(opt=>{
+        const testCounts={...myCounts};
+        for(const c in opt.from){testCounts[c]-=opt.from[c];}
+        testCounts[opt.to]=(testCounts[opt.to]||0)+1;
+        return !willUserGainSwap(testCounts,oppCounts);
+      });
+      if(safe.length>0) options.splice(0,options.length,...safe);
+    }
     let bestRisk=computeRisk(myCounts,oppCounts);
     let best=null;
     for(const opt of options){
@@ -540,6 +553,57 @@ function computeRisk(myCounts,otherCounts){
   return risk;
 }
 
+function willUserGainSwap(compCounts,userCounts){
+  const order=['quarter','dime','nickel','penny'];
+  for(const userCoin of order){
+    for(const compCoin of order){
+      const num=userCounts[userCoin];
+      if(num>=2 && compCounts[compCoin]===num && coinDefs[compCoin].value>coinDefs[userCoin].value){
+        const newUser=players[0].total - num*coinDefs[userCoin].value + num*coinDefs[compCoin].value;
+        const newComp=players[1].total - num*coinDefs[compCoin].value + num*coinDefs[userCoin].value;
+        if(newUser<=100 && newComp<=100) return true;
+      }
+    }
+  }
+  return false;
+}
+
+function findBeneficialSwap(gainerIdx){
+  const otherIdx=1-gainerIdx;
+  const myCounts=getCoinCounts(players[gainerIdx]);
+  const oppCounts=getCoinCounts(players[otherIdx]);
+  const order=['quarter','dime','nickel','penny'];
+  for(const myCoin of order){
+    for(const oppCoin of order){
+      const num=myCounts[myCoin];
+      if(num>=2 && oppCounts[oppCoin]===num && coinDefs[oppCoin].value>coinDefs[myCoin].value){
+        const newMe=players[gainerIdx].total - num*coinDefs[myCoin].value + num*coinDefs[oppCoin].value;
+        const newOpp=players[otherIdx].total - num*coinDefs[oppCoin].value + num*coinDefs[myCoin].value;
+        if(newMe<=100 && newOpp<=100){
+          return {fromIdx:gainerIdx,fromCoin:myCoin,toCoin:oppCoin,count:num};
+        }
+      }
+    }
+  }
+  return null;
+}
+
+function applySwap(option){
+  const otherIdx=1-option.fromIdx;
+  for(let i=0;i<option.count;i++){
+    removeCoins(players[option.fromIdx],option.fromCoin,1);
+    players[option.fromIdx].total-=coinDefs[option.fromCoin].value;
+    removeCoins(players[otherIdx],option.toCoin,1);
+    players[otherIdx].total-=coinDefs[option.toCoin].value;
+    players[option.fromIdx].coins.push(option.toCoin);
+    players[option.fromIdx].total+=coinDefs[option.toCoin].value;
+    players[otherIdx].coins.push(option.fromCoin);
+    players[otherIdx].total+=coinDefs[option.fromCoin].value;
+  }
+  updateHighest(players[0]);
+  updateHighest(players[1]);
+}
+
 function chooseBestPlacement(idx){
   const p=players[idx];
   const opp=players[1-idx];
@@ -555,6 +619,14 @@ function chooseBestPlacement(idx){
         return 'dime';
       }
       return 'nickel';
+    }
+    if(Math.random()<AVOID_SWAP_CHANCE){
+      const safe=allowed.filter(c=>{
+        const test={...myCounts};
+        test[c]++;
+        return !willUserGainSwap(test,oppCounts);
+      });
+      if(safe.length>0) allowed.splice(0,allowed.length,...safe);
     }
   }
   let best=allowed[0];
@@ -572,12 +644,58 @@ function chooseBestPlacement(idx){
   return best;
 }
 
+async function maybeSwapCoins(){
+  return new Promise(resolve=>{
+    const compOpt=findBeneficialSwap(1);
+    if(compOpt && Math.random()<TAKE_SWAP_CHANCE){
+      applySwap(compOpt);
+      const plural=n=>n>1?'s':'';
+      modalBody.textContent=`Computer swaps ${compOpt.count} ${compOpt.toCoin}${plural(compOpt.count)} for ${compOpt.count} ${compOpt.fromCoin}${plural(compOpt.count)}.`;
+      modalOk.style.display='block';
+      modalOk.onclick=()=>{hideModal();resolve();};
+      showModal();
+      return;
+    }
+
+    const userOpt=findBeneficialSwap(0);
+    if(userOpt){
+      modalBody.innerHTML='';
+      const msg=document.createElement('div');
+      const plural=n=>n>1?'s':'';
+      msg.textContent=`Swap ${userOpt.count} ${userOpt.fromCoin}${plural(userOpt.count)} for ${userOpt.count} ${userOpt.toCoin}${plural(userOpt.count)}?`;
+      const container=document.createElement('div');
+      container.style.display='flex';
+      container.style.alignItems='center';
+      container.style.justifyContent='center';
+      container.appendChild(createCoinElement(coinDefs[userOpt.fromCoin].img));
+      const arrow=document.createElement('span');
+      arrow.textContent='\u2192';
+      arrow.style.margin='0 10px';
+      arrow.style.fontSize='2rem';
+      container.appendChild(arrow);
+      container.appendChild(createCoinElement(coinDefs[userOpt.toCoin].img));
+      modalBody.appendChild(msg);
+      modalBody.appendChild(container);
+      const swapBtn=document.createElement('button');
+      swapBtn.textContent='Swap';
+      const skipBtn=document.createElement('button');
+      skipBtn.textContent='Skip';
+      swapBtn.onclick=()=>{applySwap(userOpt);hideModal();resolve();};
+      skipBtn.onclick=()=>{hideModal();resolve();};
+      modalBody.appendChild(swapBtn);
+      modalBody.appendChild(skipBtn);
+      showModal();
+    }else{
+      modalBody.textContent='No swap this round.';
+      modalOk.style.display='block';
+      modalOk.onclick=()=>{hideModal();resolve();};
+      showModal();
+    }
+  });
+}
+
 async function endOfRoundSteal(){
-  const p1Total=players[0].total;
-  const p2Total=players[1].total;
-  if(p1Total>=5 || p2Total>=5){
-    await highFlipModal();
-  }
+  await maybeSwapCoins();
   checkVictory();
 }
 
@@ -591,8 +709,8 @@ async function transferCoin(from,to,coin){
 }
 
 function checkVictory(){
-  const p1Win=players[0].total>=100;
-  const p2Win=players[1].total>=100;
+  const p1Win=players[0].total===100;
+  const p2Win=players[1].total===100;
   if(p1Win||p2Win){
     gameOver=true;
     let msg='Tie game!';
