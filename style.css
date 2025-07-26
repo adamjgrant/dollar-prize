@@ -61,8 +61,8 @@ body{
   font-weight:bold;
   margin-bottom:10px;
 }
-.coins-left{display:flex;flex-direction:row-reverse;align-items:center;margin-right:10px;}
-.coins-right{display:flex;flex-direction:row;align-items:center;margin-left:10px;}
+.coins-left{display:flex;flex-direction:row-reverse;align-items:center;margin-right:10px;flex-wrap:wrap;max-width:45%;}
+.coins-right{display:flex;flex-direction:row;align-items:center;margin-left:10px;flex-wrap:wrap;max-width:45%;}
 .total{margin-bottom:10px;font-weight:bold;}
 .coins img{
   width:40px;
