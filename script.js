@@ -6,6 +6,8 @@ const coinDefs={
 };
 
 const computerIdx=1; // player 2 is the computer
+// probability that the computer will use its smarter strategies
+const STRATEGY_CHANCE=0.5;
 let players=[
   {coins:[],highest:'penny',total:0,convertedThisTurn:false,placedThisTurn:false},
   {coins:[],highest:'penny',total:0,convertedThisTurn:false,placedThisTurn:false}
@@ -173,6 +175,11 @@ async function convert(idx,strategic=true){
       chooseAndApply(options[0]);
       return;
     }
+    if(Math.random()>=STRATEGY_CHANCE){
+      const randOpt=options[Math.floor(Math.random()*options.length)];
+      chooseAndApply(randOpt);
+      return;
+    }
     const oppCounts=getCoinCounts(players[1-idx]);
     const myCounts=getCoinCounts(players[idx]);
     let bestRisk=computeRisk(myCounts,oppCounts);
@@ -258,6 +265,9 @@ async function maybeDownConvert(idx,coin){
   if(opts.length<=1) return [coin];
   const p=players[idx];
   if(idx===computerIdx){
+    if(Math.random()>=STRATEGY_CHANCE){
+      return [coin];
+    }
     const oppCounts=getCoinCounts(players[1-idx]);
     const myCounts=getCoinCounts(p);
     const baseRisk=computeRisk(myCounts,oppCounts);
@@ -538,7 +548,7 @@ function chooseBestPlacement(idx){
   const allowed=['penny','nickel','dime','quarter'].filter(c=>coinDefs[c].value<=coinDefs[p.highest].value);
 
   if(idx===computerIdx){
-    if(myCounts.dime===2 && myCounts.nickel===0 && allowed.includes('nickel') && allowed.includes('dime')){
+    if(myCounts.dime===2 && myCounts.nickel===0 && allowed.includes('nickel') && allowed.includes('dime') && Math.random()<STRATEGY_CHANCE){
       const oppQuarters=oppCounts.quarter;
       const myQuarters=myCounts.quarter;
       if(oppQuarters-myQuarters===1){
@@ -551,10 +561,13 @@ function chooseBestPlacement(idx){
   let bestScore=Infinity;
   for(const coin of allowed){
     const testCounts={...myCounts};
-    testCounts[coin]++; 
+    testCounts[coin]++;
     const risk=computeRisk(testCounts,oppCounts);
     const score=risk - coinDefs[coin].value/10;
     if(score<bestScore){bestScore=score;best=coin;}
+  }
+  if(idx===computerIdx && Math.random()>=STRATEGY_CHANCE){
+    return allowed[Math.floor(Math.random()*allowed.length)];
   }
   return best;
 }
