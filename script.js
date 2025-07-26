@@ -437,7 +437,17 @@ async function highFlipModal(){
     modalBody.appendChild(resDiv);
     showModal();
 
-    const order=['quarter','dime','nickel','penny'];
+    const baseOrder=['quarter','dime','nickel','penny'];
+    let startIdx=0;
+    while(startIdx<baseOrder.length){
+      const c=baseOrder[startIdx];
+      if(countCoin(players[0],c)>0 || countCoin(players[1],c)>0){
+        break;
+      }
+      startIdx++;
+    }
+    const order=baseOrder.slice(startIdx);
+
     let actionMsg='No steal this round.';
     for(const coin of order){
       img.src=coinDefs[coin].img;
