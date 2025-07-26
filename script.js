@@ -82,12 +82,15 @@ function render(){
       if(idx===computerIdx){
         endBtn.disabled=true;
       }else{
-        endBtn.disabled=currentPlayer!==idx || !players[idx].placedThisTurn;
+        const p=players[idx];
+        const disable = currentPlayer!==idx || (!p.placedThisTurn && hasMoves(p));
+        endBtn.disabled=disable;
       }
     }
   });
   // The navbar now displays a static Rules link instead of the current round
   // information, so we no longer update that element here.
+  autoSkipIfNoMoves();
 }
 
 function placeCoin(idx,coin){
@@ -123,6 +126,26 @@ function updateHighest(p){
     }
   });
   p.highest=maxCoin;
+}
+
+function canPlaceCoin(p){
+  const limit=coinDefs[p.highest].value;
+  return Object.keys(coinDefs).some(c=>
+    coinDefs[c].value<=limit && p.total+coinDefs[c].value<=100);
+}
+
+function hasMoves(p){
+  return canPlaceCoin(p) || (!p.convertedThisTurn && canConvert(p));
+}
+
+function autoSkipIfNoMoves(){
+  if(gameOver) return;
+  const idx=currentPlayer;
+  if(idx===computerIdx) return;
+  const p=players[idx];
+  if(!hasMoves(p)){
+    setTimeout(()=>endTurn(idx),200);
+  }
 }
 
 function canConvert(p){
@@ -517,7 +540,7 @@ async function endTurn(idx){
   if(gameOver) return;
   if(idx!==currentPlayer) return;
   const p=players[idx];
-  if(!p.placedThisTurn) return;
+  if(!p.placedThisTurn && hasMoves(p)) return;
   p.convertedThisTurn=false;
   p.placedThisTurn=false;
   turnInRound++;
@@ -723,6 +746,11 @@ async function computerTurn(){
   if(gameOver) return;
   if(currentPlayer!==computerIdx) return;
   const p=players[computerIdx];
+
+  if(!hasMoves(p)){
+    await endTurn(computerIdx);
+    return;
+  }
 
   const strategic=Math.random()<0.7;
 
