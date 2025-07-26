@@ -249,7 +249,24 @@ async function maybeDownConvert(idx,coin){
   if(opts.length<=1) return [coin];
   const p=players[idx];
   if(idx===computerIdx){
-    if(Math.random()<0.5){
+    const oppCounts=getCoinCounts(players[1-idx]);
+    const myCounts=getCoinCounts(p);
+    const baseRisk=computeRisk(myCounts,oppCounts);
+
+    const convertCounts={...myCounts};
+    convertCounts[coin]--;
+    opts[1].forEach(c=>{convertCounts[c]=(convertCounts[c]||0)+1;});
+    const convertRisk=computeRisk(convertCounts,oppCounts);
+
+    const nearEnd=players[0].total>=80 && players[1].total>=80;
+    let keepProb=0.5;
+    if(convertRisk<baseRisk){
+      keepProb=nearEnd?0.35:0.2;
+    }else if(convertRisk>baseRisk){
+      keepProb=nearEnd?0.6:0.8;
+    }
+
+    if(Math.random()>keepProb){
       const choice=opts[1];
       removeCoins(p,coin,1);
       p.total-=coinDefs[coin].value;
