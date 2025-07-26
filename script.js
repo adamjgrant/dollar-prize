@@ -122,7 +122,10 @@ function updateHighest(p){
 function canConvert(p){
   const counts={penny:0,nickel:0,dime:0};
   p.coins.forEach(c=>{if(counts.hasOwnProperty(c)) counts[c]++;});
-  return counts.penny>=5 || counts.nickel>=2 || (counts.nickel>=1 && counts.dime>=2);
+  return counts.penny>=5 ||
+         counts.nickel>=2 ||
+         (counts.nickel>=1 && counts.dime>=2) ||
+         (counts.penny>=5 && counts.dime>=2);
 }
 
 async function convert(idx,strategic=true){
@@ -143,6 +146,9 @@ async function convert(idx,strategic=true){
   }
   if(counts.nickel>=1 && counts.dime>=2){
     options.push({from:{nickel:1,dime:2},to:'quarter'});
+  }
+  if(counts.penny>=5 && counts.dime>=2){
+    options.push({from:{penny:5,dime:2},to:'quarter'});
   }
   if(options.length===0) return;
 
