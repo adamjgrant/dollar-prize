@@ -9,7 +9,7 @@ const computerIdx=1; // player 2 is the computer
 // probability that the computer will use its smarter strategies
 const STRATEGY_CHANCE=0.5;
 const AVOID_SWAP_CHANCE=0.8; // computer avoids giving user swap 80% of time
-const TAKE_SWAP_CHANCE=0.8;  // computer takes beneficial swap 80% of time
+const TAKE_SWAP_CHANCE=1.0;  // computer always takes beneficial swap
 let players=[
   {coins:[],highest:'penny',total:0,convertedThisTurn:false,placedThisTurn:false},
   {coins:[],highest:'penny',total:0,convertedThisTurn:false,placedThisTurn:false}

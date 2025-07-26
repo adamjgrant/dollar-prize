@@ -38,7 +38,7 @@ Players alternate turns. On your turn, you must:
 ### End of Round Swap
 
 After both players have taken a turn, check to see if one player has the same number of one denomination as the other player has of a different denomination. If that shared amount is **two or more**, they may swap that many coins. You will be shown a **Swap** button displaying a single coin from each side with an arrow between them. The computer decides automatically when it benefits.
-The computer usually avoids setting up swaps where you could trade for a higher value coin and, when it has the chance, will swap for the better coin about 80% of the time.
+The computer usually avoids setting up swaps where you could trade for a higher value coin and, when it has the chance, will swap for the better coin every time.
 # Clarifications
 - **A conversion** can only happen once per turn but it **does not cost you a turn**. You can either start or end your turn with a conversion, then play that converted value if you want.
 - **The first player does not have the advantage**. If the first player gets to $1 in their turn, the second player can still play their turn for the round. If both end up with exactly $1 after the swap step, they tie and share the prize.
