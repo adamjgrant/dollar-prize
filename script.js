@@ -96,6 +96,9 @@ function placeCoin(idx,coin){
   p.placedThisTurn=true;
   updateHighest(p);
   render();
+  if(idx===0 && (!canConvert(p) || p.convertedThisTurn)){
+    setTimeout(() => endTurn(idx), 200);
+  }
 }
 
 function removeCoins(p,coinType,num){
