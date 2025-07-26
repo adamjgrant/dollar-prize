@@ -31,6 +31,7 @@ Players alternate turns. On your turn, you must:
         - **5 pennies** → **1 nickel**
         - **2 nickels** → **1 dime**
         - **1 nickel + 2 dimes** → **1 quarter**
+        - **5 pennies + 2 dimes** → **1 quarter**
     - After converting, place the new denomination coin as your new outermost coin and return any converted coins to the bank.
 - Throughout the game, your coins must be in ascending order from the prize outwards.
 - Once each player has played a turn this completes the round
