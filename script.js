@@ -644,58 +644,50 @@ function chooseBestPlacement(idx){
   return best;
 }
 
-async function maybeSwapCoins(){
-  return new Promise(resolve=>{
-    const compOpt=findBeneficialSwap(1);
-    if(compOpt && Math.random()<TAKE_SWAP_CHANCE){
-      applySwap(compOpt);
-      const plural=n=>n>1?'s':'';
-      modalBody.textContent=`Computer swaps ${compOpt.count} ${compOpt.toCoin}${plural(compOpt.count)} for ${compOpt.count} ${compOpt.fromCoin}${plural(compOpt.count)}.`;
-      modalOk.style.display='block';
-      modalOk.onclick=()=>{hideModal();resolve();};
-      showModal();
-      return;
-    }
+function computerAutoSwap(){
+  const compOpt=findBeneficialSwap(1);
+  if(compOpt && Math.random()<TAKE_SWAP_CHANCE){
+    applySwap(compOpt);
+  }
+}
 
-    const userOpt=findBeneficialSwap(0);
-    if(userOpt){
-      modalBody.innerHTML='';
-      const msg=document.createElement('div');
-      const plural=n=>n>1?'s':'';
-      msg.textContent=`Swap ${userOpt.count} ${userOpt.fromCoin}${plural(userOpt.count)} for ${userOpt.count} ${userOpt.toCoin}${plural(userOpt.count)}?`;
-      const container=document.createElement('div');
-      container.style.display='flex';
-      container.style.alignItems='center';
-      container.style.justifyContent='center';
-      container.appendChild(createCoinElement(coinDefs[userOpt.fromCoin].img));
-      const arrow=document.createElement('span');
-      arrow.textContent='\u2192';
-      arrow.style.margin='0 10px';
-      arrow.style.fontSize='2rem';
-      container.appendChild(arrow);
-      container.appendChild(createCoinElement(coinDefs[userOpt.toCoin].img));
-      modalBody.appendChild(msg);
-      modalBody.appendChild(container);
-      const swapBtn=document.createElement('button');
-      swapBtn.textContent='Swap';
-      const skipBtn=document.createElement('button');
-      skipBtn.textContent='Skip';
-      swapBtn.onclick=()=>{applySwap(userOpt);hideModal();resolve();};
-      skipBtn.onclick=()=>{hideModal();resolve();};
-      modalBody.appendChild(swapBtn);
-      modalBody.appendChild(skipBtn);
-      showModal();
-    }else{
-      modalBody.textContent='No swap this round.';
-      modalOk.style.display='block';
-      modalOk.onclick=()=>{hideModal();resolve();};
-      showModal();
-    }
+async function userSwap(){
+  const userOpt=findBeneficialSwap(0);
+  if(!userOpt) return;
+  await new Promise(resolve=>{
+    modalBody.innerHTML='';
+    const msg=document.createElement('div');
+    const plural=n=>n>1?'s':'';
+    msg.textContent=`Swap ${userOpt.count} ${userOpt.fromCoin}${plural(userOpt.count)} for ${userOpt.count} ${userOpt.toCoin}${plural(userOpt.count)}?`;
+    const container=document.createElement('div');
+    container.style.display='flex';
+    container.style.alignItems='center';
+    container.style.justifyContent='center';
+    container.appendChild(createCoinElement(coinDefs[userOpt.fromCoin].img));
+    const arrow=document.createElement('span');
+    arrow.textContent='\u2192';
+    arrow.style.margin='0 10px';
+    arrow.style.fontSize='2rem';
+    container.appendChild(arrow);
+    container.appendChild(createCoinElement(coinDefs[userOpt.toCoin].img));
+    modalBody.appendChild(msg);
+    modalBody.appendChild(container);
+    const swapBtn=document.createElement('button');
+    swapBtn.textContent='Swap';
+    const skipBtn=document.createElement('button');
+    skipBtn.textContent='Skip';
+    swapBtn.onclick=()=>{applySwap(userOpt);hideModal();resolve();};
+    skipBtn.onclick=()=>{hideModal();resolve();};
+    modalBody.appendChild(swapBtn);
+    modalBody.appendChild(skipBtn);
+    showModal();
   });
+  render();
+  checkVictory();
 }
 
 async function endOfRoundSteal(){
-  await maybeSwapCoins();
+  computerAutoSwap();
   checkVictory();
 }
 
@@ -764,6 +756,7 @@ async function computerTurn(){
 
 document.getElementById('p1Convert').addEventListener('click',()=>convert(0));
 document.getElementById('p1EndTurn').addEventListener('click',()=>endTurn(0));
+document.getElementById('swapBtn').addEventListener('click',userSwap);
 // player 2 is the computer so no manual controls
 
 // coin placement buttons
