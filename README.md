@@ -45,7 +45,7 @@ Refer to this end of the round steal only once one of the players has at least 5
 
 ![[IMG_4286.jpg|450]]
 
-1. Like a handful of dice, take one coin of each (25/10/5/1) denomination and flip them simultaneously. Check the value of each in descending order start with the **quarter**:
+1. Like a handful of dice, take the coin of the highest denomination currently on the board and one of every denomination below it and flip them simultaneously. Check the value of each in descending order. Start with the highest value. For example, assuming the **quarter** is the highest denomination that currently appears:
     - **Heads:** Do one of the following, then proceed to the next round. **Ignore the result of lower denominations.**
         - The player with more quarters than the other gives one quarter to the other player.
         - If both have the same number of quarters, nothing happens.
