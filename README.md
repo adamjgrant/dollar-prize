@@ -14,6 +14,12 @@ They player to earn the most money at a minimum of $1 in a single round wins.
 # Gameplay
 
 ![[IMG_4280.jpg|450]]
+
+## Setup
+
+- Each player should pick a side, either heads or tails. Then one of the players will take five pennies and flip them all together like a hand of dice.
+- Each player takes the pennies that landed on the side they chose and add them to their side of the prize in a line.
+- No conversions (explained later) allowed in the setup.
 ## Turn Sequence
 
 Players alternate turns. On your turn, you must:
